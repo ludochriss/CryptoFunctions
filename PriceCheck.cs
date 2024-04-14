@@ -11,7 +11,7 @@ namespace CryptoFunctions.PriceCheck
 {
     public class PriceCheck : BaseFunction<PriceCheck>
     {
-        public CryptoService _cryptoService { get; set; }
+        private CryptoService _cryptoService { get; set; }
         public PriceCheck(ILogger<PriceCheck> _logger, TableService tableService, RestApiService apiService, CryptoService cryptoService) : base(_logger, tableService, apiService)
         {
             _cryptoService = cryptoService;
@@ -22,7 +22,7 @@ namespace CryptoFunctions.PriceCheck
         {
             Guid guid = new Guid();
             string name = "PriceCheck";
-
+            //TODO: refactor this to be useful and to actually check prices and return to the spa
             //var cancelResult =  await _cryptoService.SpotAccountTrade.CancelAllOpenOrdersOnASymbol("BTCUSDT");
             //get orderBinding AND orderSubmittedSuccessfully = false
             string filter = "orderSubmitted eq false";
@@ -33,22 +33,24 @@ namespace CryptoFunctions.PriceCheck
                 var containsSymbol = trigger.TryGetValue("symbol", out object symbol);
                 if (containsOrderId && containsSymbol)
                 {
-                    var result = await _cryptoService.QueryOpenOrdersForSymbolAsync(symbol.ToString().ToUpper(), long.Parse(bindingOrderId.ToString()));
-                    if (result == null)
-                    {
-                        var orderResult = await _cryptoService.PostOneCancelsOtherOrderAsync(trigger);
-                        var orderListId = orderResult.FirstOrDefault(x => x.Key == "orderListId").Value;
-                        var ocoOrders = orderResult.FirstOrDefault(x => x.Key == "orders").Value as JsonArray;
-                        if (orderResult != null && ocoOrders != null)
-                        {
-                            logger.LogInformation($"{name}: OCO order submitted successfully. OrderListId: {orderListId}");
-                            TableEntity te = new TableEntity(trigger);
-                            te.Remove("orderSubmitted");
-                            te.Add("orderSubmitted", true);
-                            var upsertResult =await _tableService.UpsertAsync(te);
-                            //TODO:send update to SPA if the upsert fails
-                        }                      
-                    }
+                    //var result = await _cryptoService.QueryOpenOrdersForSymbolAsync(symbol.ToString().ToUpper(), long.Parse(bindingOrderId.ToString()));
+                  var result  =  await _cryptoService.SpotAccountTrade.CurrentOpenOrders();
+               //SEEMS TO CHECK FOR OPEN EXISITNG ORDERS IN TABLE STORAGE. NEED TO MOVE
+                //    if (result == null)
+                //     {
+                //         var orderResult = await _cryptoService.PostOneCancelsOtherOrderAsync(trigger);
+                //         var orderListId = orderResult.FirstOrDefault(x => x.Key == "orderListId").Value;
+                //         var ocoOrders = orderResult.FirstOrDefault(x => x.Key == "orders").Value as JsonArray;
+                //         if (orderResult != null && ocoOrders != null)
+                //         {
+                //             logger.LogInformation($"{name}: OCO order submitted successfully. OrderListId: {orderListId}");
+                //             TableEntity te = new TableEntity(trigger);
+                //             te.Remove("orderSubmitted");
+                //             te.Add("orderSubmitted", true);
+                //             var upsertResult =await _tableService.UpsertAsync(te);
+                //             //TODO:send update to SPA if the upsert fails
+                //         }                      
+                //     }
                 }
             }
         }

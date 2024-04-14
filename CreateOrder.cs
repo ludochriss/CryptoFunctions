@@ -19,8 +19,10 @@ namespace CryptoFunctions
         }
 
         [Function("CreateOrder")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post","options")] HttpRequestData req)
         {
+            //return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, HttpResponseHeaders);
+            
             logger.LogInformation("Started the CreateOrder function.");
             string message = string.Empty;
             JsonObject jsonResponse = null;
@@ -42,13 +44,7 @@ namespace CryptoFunctions
                 jsonResponse = await _cryptoService.CreateLimitOrderAsync(orderDetails, orderId); 
                 break;
             }          
-            
-
-        
-
             return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, jsonResponse);
-
-
         }
     }
 }

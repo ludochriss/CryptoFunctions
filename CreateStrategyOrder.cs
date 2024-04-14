@@ -25,7 +25,8 @@ namespace CryptoFunctions
         [Function("CreateStrategyOrder")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
-
+            //entry and exit at same time
+            //exit for a limit order already placed requires the id
             string name = "CreateStrategyOrder";
             logger.LogInformation("Started the CreateStrategyOrder function.");
             string message = string.Empty;
@@ -50,8 +51,9 @@ namespace CryptoFunctions
                 var subType = requestJson.TryGetPropertyValue("orderSubType", out var subTypeValue) ? subTypeValue.ToString().ToLower() : null;
                 var triggerOrderId = orderTrigger.TryGetPropertyValue("orderId", out var triggerOrderIdValue) ? triggerOrderIdValue.ToString() : null;
                 var symbol = ocoOrderDetails.TryGetPropertyValue("symbol", out var symbolValue) ? symbolValue.ToString() : null;
+                string timeStamp =  ocoOrderDetails.TryGetPropertyValue("timestamp", out var timeStampValue) ? timeStampValue.ToString() : null;
 
-                if (subType == null || triggerOrderId == null || symbol == null || ocoOrderDetails == null || orderTrigger == null || orderType == null) throw new ArgumentException("Invalid request body. Order subType, symbol, orderDetails, orderTrigger or clientOrderId not found in payload.");
+                if (subType == null || triggerOrderId == null || symbol == null || ocoOrderDetails == null || orderTrigger == null || orderType == null||timeStamp ==null) throw new ArgumentException("Invalid request body. Order subType, symbol, orderDetails, orderTrigger or clientOrderId not found in payload.");
                 //consider sending the order to testnet for validation?
 
                 if (orderType == "oco" && subType == "exit")
