@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -28,8 +29,14 @@ namespace CryptoFunctions
             {
                 JsonObject requestBody =req.Body != null? await JsonSerializer.DeserializeAsync<JsonObject>(req.Body)?? new JsonObject(): new JsonObject();
                 var orderId=  requestBody.FirstOrDefault(x => x.Key == "orderId").Value;
-               var result = await  _cryptoService.SpotAccountTrade.QueryOrder("BTCUSDT",(long)orderId);
-               logger.LogInformation("Complete");
+                var data=  requestBody.FirstOrDefault(x => x.Key == "data").Value;
+                var symbol = requestBody.FirstOrDefault(x=>x.Key == "symbol").Value;
+                var result = await  _cryptoService.SpotAccountTrade.QueryOrder("BTCUSDT",(long)orderId);
+                TableEntity testEntity = new TableEntity(data.ToString(), "testEntity");
+                
+                var tResult = await _tableService.UpsertAsync(symbol.ToString(),testEntity);
+
+               logger.LogInformation($"Complete, tResult : {tResult}");
             }
             catch (Exception ex)
             {

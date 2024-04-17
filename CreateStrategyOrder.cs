@@ -5,9 +5,7 @@ using Azure.Data.Tables;
 using Google.Protobuf;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Tls.Crypto.Impl.BC;
 using Services;
 using Services.Functions;
 
@@ -51,7 +49,7 @@ namespace CryptoFunctions
                 var subType = requestJson.TryGetPropertyValue("orderSubType", out var subTypeValue) ? subTypeValue.ToString().ToLower() : null;
                 var triggerOrderId = orderTrigger.TryGetPropertyValue("orderId", out var triggerOrderIdValue) ? triggerOrderIdValue.ToString() : null;
                 var symbol = ocoOrderDetails.TryGetPropertyValue("symbol", out var symbolValue) ? symbolValue.ToString() : null;
-                string timeStamp =  ocoOrderDetails.TryGetPropertyValue("timestamp", out var timeStampValue) ? timeStampValue.ToString() : null;
+                string timeStamp =  ocoOrderDetails.TryGetPropertyValue("timeStamp", out var timeStampValue) ? timeStampValue.ToString() : null;
 
                 if (subType == null || triggerOrderId == null || symbol == null || ocoOrderDetails == null || orderTrigger == null || orderType == null||timeStamp ==null) throw new ArgumentException("Invalid request body. Order subType, symbol, orderDetails, orderTrigger or clientOrderId not found in payload.");
                 //consider sending the order to testnet for validation?
@@ -80,9 +78,10 @@ namespace CryptoFunctions
                     e.Add("orderType", orderType);
                     e.Add("orderSubType", subType);
                     e.Add("orderSubmitted", false);
-                    //TODO: hit table service to upload the order and the strategy
-                    var tableResult = await _tableService.UpsertAsync(e);
-                    jsonResponseData.Add("TriggerOrderPlaced", tableResult);
+                    var tableResult = await _tableService.UpsertAsync("SPOT",e);
+                    
+                    jsonResponseData.Add("TriggerOrderTableResult", tableResult);
+
                     jsonResponse =await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, jsonResponseData);
                 }
             }
