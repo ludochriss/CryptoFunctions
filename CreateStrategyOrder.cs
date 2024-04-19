@@ -51,7 +51,7 @@ namespace CryptoFunctions
                 var symbol = ocoOrderDetails.TryGetPropertyValue("symbol", out var symbolValue) ? symbolValue.ToString() : null;
                 string timeStamp =  ocoOrderDetails.TryGetPropertyValue("timeStamp", out var timeStampValue) ? timeStampValue.ToString() : null;
 
-                if (subType == null || triggerOrderId == null || symbol == null || ocoOrderDetails == null || orderTrigger == null || orderType == null||timeStamp ==null) throw new ArgumentException("Invalid request body. Order subType, symbol, orderDetails, orderTrigger or clientOrderId not found in payload.");
+                if (subType == null || triggerOrderId == null || symbol == null || ocoOrderDetails == null || orderTrigger == null || orderType == null) throw new ArgumentException("Invalid request body. Order subType, symbol, orderDetails, orderTrigger or clientOrderId not found in payload.");
                 //consider sending the order to testnet for validation?
 
                 if (orderType == "oco" && subType == "exit")
