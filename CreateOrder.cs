@@ -19,31 +19,45 @@ namespace CryptoFunctions
         }
 
         [Function("CreateOrder")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post","options")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post", "options")] HttpRequestData req)
         {
             //return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, HttpResponseHeaders);
-            
-            logger.LogInformation("Started the CreateOrder function.");
             string message = string.Empty;
             JsonObject jsonResponse = null;
-            long orderId = _cryptoService.GenerateNewBinanceOrderId();
-            JsonObject requestJson = await JsonSerializer.DeserializeAsync<JsonObject>(req.Body);
-            string orderType = requestJson.FirstOrDefault(x => x.Key == "orderType").Value.ToString().ToLower();
-            JsonObject orderDetails =  requestJson.FirstOrDefault(x => x.Key == "orderDetails").Value as JsonObject;          
-            if (string.IsNullOrEmpty(orderType) ||null == orderDetails ||null == requestJson)
+            try
             {
-                return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.BadRequest, "Invalid request body. Order details or order type not found.");
+                logger.LogInformation("Started the CreateOrder function.");
+                long orderId = _cryptoService.GenerateNewBinanceOrderId();
+                JsonObject requestJson = await JsonSerializer.DeserializeAsync<JsonObject>(req.Body);
+                string orderType = requestJson.FirstOrDefault(x => x.Key == "orderType").Value.ToString().ToLower();
+                JsonObject orderDetails = requestJson.FirstOrDefault(x => x.Key == "orderDetails").Value as JsonObject;
+                if (string.IsNullOrEmpty(orderType) || null == orderDetails || null == requestJson)
+                {
+                    return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.BadRequest, "Invalid request body. Order details or order type not found.");
+                }
+
+                //TODO: add validation for properties in each order type as per binance docs
+                switch (orderType)
+                {
+                    case "oco":
+                        jsonResponse = await _cryptoService.PostOneCancelsOtherOrderAsync(orderDetails, orderId);
+                        break;
+                    case "limit":
+                        jsonResponse = await _cryptoService.CreateLimitOrderAsync(orderDetails, orderId);
+                        break;
+                }
+
             }
-            
-            //TODO: add validation for properties in each order type as per binance docs
-            switch(orderType){
-                case "oco" :
-                jsonResponse = await _cryptoService.PostOneCancelsOtherOrderAsync(orderDetails,orderId);
-                break;
-                case  "limit" :
-                jsonResponse = await _cryptoService.CreateLimitOrderAsync(orderDetails, orderId); 
-                break;
-            }          
+            catch (Exception ex)
+            {
+                logger.LogError($"Exception: {ex.Message}");
+                return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.InternalServerError, ex.Message);
+
+            }
+            finally
+            {
+                logger.LogInformation("Complete");
+            }
             return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, jsonResponse);
         }
     }
