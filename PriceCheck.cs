@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Nodes;
-using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Services;
@@ -22,9 +19,7 @@ namespace CryptoFunctions.PriceCheck
         {
             Guid guid = new Guid();
             string name = "PriceCheck";
-            //TODO: refactor this to be useful and to actually check prices and return to the spa
-            //var cancelResult =  await _cryptoService.SpotAccountTrade.CancelAllOpenOrdersOnASymbol("BTCUSDT");
-            //get orderBinding AND orderSubmittedSuccessfully = false
+            
             string filter = "orderSubmitted eq false";
             var triggers = await _tableService.QueryAsync(filter);
             foreach (var trigger in triggers)

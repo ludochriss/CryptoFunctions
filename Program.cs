@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 string environment =  Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "DEVELOPMENT";//["Values:ASPNETCORE_ENVIRONMENT"] ?? configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
 

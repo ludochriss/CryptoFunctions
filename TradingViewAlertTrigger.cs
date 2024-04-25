@@ -27,7 +27,6 @@ namespace CryptoFunctions
             string name = "TradingViewAlertTrigger";
             logger.LogInformation($"{name}: Started");
             string result = string.Empty;
-            JsonObject jsonResponse = new JsonObject();
             string tableName = "TradingViewAlertOrders";
             try
             {
@@ -40,7 +39,7 @@ namespace CryptoFunctions
                 {
                     logger.LogError($"{name}: No body in the alert request");
                     return;
-                    //TODO: need to alert me/user that the alert failed somehow
+                    //TODO: need to alert me/user that the alert failed somehow, add failed order to table storage, then have a notified field and an api that checks periodically
                 }
 
                 JsonObject requestBody = req.Body != null ? await JsonSerializer.DeserializeAsync<JsonObject>(req.Body) ?? new JsonObject() : new JsonObject();
@@ -83,54 +82,13 @@ namespace CryptoFunctions
                 if(orderFilled){
                     te["executed"] = true;
                     await _tableService.UpsertAsync(tableName, te);
+                    te.Add("orderAtUtc", DateTime.UtcNow);
                 }
                 else{
                     logger.LogError($"{name}: Order not filled: \n{bResult}");
-                }
-        
-                
-                
-
-
-                //TODO: remove if not used - 23/04this is for an order in the body, probably not going to use but keep for now 
-                // var side = requestBody.FirstOrDefault(x => x.Key == "side").Value.ToString().ToLower()  == "buy" ? Side.BUY : Side.SELL;
-                // var symbol = requestBody.FirstOrDefault(x => x.Key == "symbol").Value.ToString();
-                // var price = requestBody.FirstOrDefault(x => x.Key == "price").Value.ToString();
-                // var quantity = requestBody.FirstOrDefault(x => x.Key == "quantity").Value.ToString();
-                // var orderId = requestBody.FirstOrDefault(x => x.Key == "orderId").Value.ToString();
-                // //logger.LogInformation($"{name}:  {symbol} {price} {quantity} {orderId} extracted from body");
-                // if (string.IsNullOrEmpty(side.ToString()) || string.IsNullOrEmpty(symbol) || string.IsNullOrEmpty(price) || string.IsNullOrEmpty(quantity) || string.IsNullOrEmpty(orderId))
-                // {
-                //     logger.LogError($"{name}: Missing required parameters in the alert request");
-                //     return new BadRequestObjectResult(new {message= "Please pass action, symbol, price, quantity and orderId in the alert request body"});
-                // }
-
-                // decimal dquantity = decimal.Parse(quantity);    
-                // decimal dprice = decimal.Parse(price);  
-                // logger.LogInformation($"Quantity and price parsed.");
-
-
-                // logger.LogInformation($"Attempting to execute order");
-                // result = await _cryptoService.SpotAccountTrade.NewOrder(symbol, side,OrderType.LIMIT,TimeInForce.GTC, dquantity,null,dprice );
-                // logger.LogInformation($"Order Executed: \n{result}");
-                // jsonResponse.Add("orderResult", result);
-                // // TradingViewAlertModel tv = new TradingViewAlertModel(action, symbol, decimal.Parse(price), decimal.Parse(quantity), orderId);
-                // TableEntity te = new TableEntity();
-                // JsonDocument response =JsonDocument.Parse(result);
-
-                // foreach (var property in response.RootElement.EnumerateObject())
-                // {
-                //     string propertyName = property.Name;
-                //     object propertyValue = property.Value;
-                //     te[property.Name] = propertyValue.ToString();
-                // }
-                // te.Add("PartitionKey", $"TradingViewAlert-{symbol}");
-                // te.Add("RowKey", _cryptoService.GenerateNewBinanceOrderId().ToString());
-                // logger.LogInformation($"Response parsed. Attempting to upsert to table storage.");
+                }        
                 // //TODO: change this to a specific table for confirmations
-                // var tResult = await _tableService.UpsertAsync(te);
-                // logger.LogInformation($"{name}: {result}");
-                // jsonResponse.Add("upsertResult", tResult);
+                // var tResult = await _tableService.UpsertAsync(te);          
             }
             catch(BinanceHttpException ex){
                 logger.LogError($"{name}: BinanceHttpException: {ex.Message}");

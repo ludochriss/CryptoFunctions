@@ -47,7 +47,7 @@ namespace CryptoFunctions
                         break;
                 }
 
-            }
+            } 
             catch (Exception ex)
             {
                 logger.LogError($"Exception: {ex.Message}");

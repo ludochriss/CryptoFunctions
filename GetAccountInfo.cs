@@ -18,7 +18,6 @@ namespace CryptoFunctions
         {
             _cryptoService = cryptoService;
         }
-
         [Function("GetAccountInfo")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {

@@ -6,7 +6,6 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Services;
 using Services.Functions;
-using Services.Models;
 
 namespace CryptoFunctions
 {

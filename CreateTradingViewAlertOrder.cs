@@ -48,6 +48,7 @@ namespace CryptoFunctions
                 te.Add("executed", false);
                 te.Add("quantity", quantity);
                 te.Add("side", side.ToString());
+                te.Add("orderCreated",DateTime.UtcNow);
                 var tResult = await _tableService.UpsertAsync("TradingViewAlertOrders", te);
                 jResponse.Add("Successful", tResult);
             }
