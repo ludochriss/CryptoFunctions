@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 
 string environment =  Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "DEVELOPMENT";//["Values:ASPNETCORE_ENVIRONMENT"] ?? configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
 
-
 var config= new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddEnvironmentVariables();
@@ -17,8 +16,8 @@ var config= new ConfigurationBuilder()
         if(string.IsNullOrEmpty(jsonString)){
             throw new Exception("cloud.settings.json not found in environment variables");
         }
-        var dictionary =  JsonConvert.DeserializeObject<Dictionary<string,string>>(jsonString);
-        config.AddInMemoryCollection(dictionary);
+        //var dictionary =  JsonConvert.DeserializeObject<Dictionary<string,string>>(jsonString);
+        //config.AddInMemoryCollection(dictionary);
     }
     else if (environment == "Development")
     {

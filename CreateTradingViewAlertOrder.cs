@@ -21,7 +21,7 @@ namespace CryptoFunctions
         }
 
         [Function("CreateTradingViewAlertOrder")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function,"post")] HttpRequestData req)
         {
             string name = "CreateTradingViewAlertOrder";
             JsonObject jResponse = new JsonObject();
@@ -42,7 +42,7 @@ namespace CryptoFunctions
                 var side = sideValue.ToLower() == "buy" ? Side.BUY : Side.SELL;
                 TableEntity te = new TableEntity
                 {
-                    PartitionKey = symbol,
+                    PartitionKey = symbol.ToUpper(),
                     RowKey = orderBindingId
                 };
                 te.Add("executed", false);

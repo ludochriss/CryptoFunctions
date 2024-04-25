@@ -21,7 +21,7 @@ namespace CryptoFunctions
         }
 
         [Function("TestTrigger")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous,  "post")] HttpRequest req)
         {
             string name = "TestTrigger";
             logger.LogInformation($"{name}: Started");

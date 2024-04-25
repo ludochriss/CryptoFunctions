@@ -19,7 +19,7 @@ namespace CryptoFunctions
         }
 
         [Function("CreateOrder")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post", "options")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             //return await _restApiService.HandleHttpResponseAsync(req, HttpStatusCode.OK, HttpResponseHeaders);
             string message = string.Empty;
