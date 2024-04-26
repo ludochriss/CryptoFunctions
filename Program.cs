@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 string environment =  Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "DEVELOPMENT";//["Values:ASPNETCORE_ENVIRONMENT"] ?? configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
-
+Console.WriteLine("The Linux has beginsed!");
 var config= new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddEnvironmentVariables();
